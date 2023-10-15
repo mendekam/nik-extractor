@@ -119,22 +119,22 @@ def extract_nip():
                 word_processed = word_to_number_converter(line)
                 if "NIK" in word_processed:
                     nik = re.split("= | :", word_processed)
-                    match = re.search(r'\d+', nik[1].strip())
+                    match = re.search(r'\d+', nik[1].replace(" ", ""))
                     print(nik[1].strip())
 
                     if match:
-                        nik = match.group().strip()
-
+                        nik_output = match.group().strip()
+                        print(nik_output)
                         break
 
                 
 
 
-            print("NIK:", nik)
+            print("NIK:", nik_output)
 
 
             return {
-                "nik": nik
+                "nik": nik_output
 
             }, 200
         
