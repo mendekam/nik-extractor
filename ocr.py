@@ -15,6 +15,24 @@ import re
 
 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
 
+# filename = 'test.jpeg'
+# # image.save(os.path.join("uploads", filename))
+# # image = cv2.imread(os.path.join("uploads", filename))
+# image = cv2.imread(filename)
+# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# gray = cv2.medianBlur(gray, 3)
+
+# filename_gray = 'gray.jpeg'.format(os.getpid())
+# cv2.imwrite(filename_gray, gray)
+
+# image_gray = Image.open(filename_gray)
+# imageplot = plt.imshow(image_gray)
+# plt.show()
+
+# text = pytesseract.image_to_string(image_gray)
+# lines = text.split('\n')
+# print(lines)
+
 
 def allowed_image(filename):
 
@@ -47,7 +65,9 @@ def word_to_number_converter(word):
 
         'o': "0",
 
-        '?': "7"
+        '?': "7",
+
+        'e': "2"
 
     }
 
@@ -104,6 +124,7 @@ def extract_nip():
 
             gray = cv2.medianBlur(gray, 3)
 
+            plt.imshow(gray)
 
             text = pytesseract.image_to_string(gray)
 
@@ -112,13 +133,13 @@ def extract_nip():
 
             print(lines)
 
-            nik = None
+            nik_output = None
 
             for line in lines:
 
                 word_processed = word_to_number_converter(line)
                 if "NIK" in word_processed:
-                    nik = re.split("= | :", word_processed)
+                    nik = re.split("= | : | >", word_processed)
                     match = re.search(r'\d+', nik[1].replace(" ", ""))
                     print(nik[1].strip())
 
@@ -126,11 +147,6 @@ def extract_nip():
                         nik_output = match.group().strip()
                         print(nik_output)
                         break
-
-                
-
-
-            print("NIK:", nik_output)
 
 
             return {
