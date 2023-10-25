@@ -20,7 +20,6 @@ pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesserac
 # # image = cv2.imread(os.path.join("uploads", filename))
 # image = cv2.imread(filename)
 # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-# gray = cv2.medianBlur(gray, 3)
 
 # filename_gray = 'gray.jpeg'.format(os.getpid())
 # cv2.imwrite(filename_gray, gray)
@@ -29,7 +28,7 @@ pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesserac
 # imageplot = plt.imshow(image_gray)
 # plt.show()
 
-# text = pytesseract.image_to_string(image_gray)
+# text = pytesseract.image_to_string(image_gray, lang='ind', config='--psm 6')
 # lines = text.split('\n')
 # print(lines)
 
@@ -86,7 +85,7 @@ def word_to_number_converter(word):
     return res
 
 
-def extract_nip():
+def extract_nik():
 
 
     if request.method == "POST":
@@ -121,7 +120,6 @@ def extract_nip():
             image = cv2.imread(os.path.join("uploads", filename))
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
             gray = cv2.medianBlur(gray, 3)
 
             plt.imshow(gray)
@@ -162,6 +160,76 @@ def extract_nip():
 
             }, 400
     
-
+def extract_nip():
+    
+        if request.method == "POST":
+    
+            image = request.files["image"]
+    
+    
+            if image.filename == "":
+    
+                return {
+    
+                    "message": "No image"
+    
+                }, 400
+            
+    
+            if not allowed_image(image.filename):
+    
+                return {
+    
+                    "message": "Allowed image extensions are: JPEG, JPG, PNG"
+    
+                }, 400
+            
+    
+            if allowed_image(image.filename):
+    
+                filename = image.filename
+    
+                image.save(os.path.join("uploads", filename))
+    
+                image = cv2.imread(os.path.join("uploads", filename))
+    
+                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                gray = cv2.medianBlur(gray, 3)
+    
+                text = pytesseract.image_to_string(gray)
+    
+    
+                lines = text.split('\n')
+    
+                print(lines)
+    
+                nip_output = None
+                name_output = None
+    
+                for line in lines:
+                    s = line.replace(r'[^\w]', "")
+                    text = line.replace(" ", "")
+                    print(text)
+                    if text.isalpha():
+                        name_output = line
+                        print(name_output)
+                    elif line.isalnum() or line.isnumeric():
+                        word_processed = word_to_number_converter(line)
+                        nip_output = word_processed.strip()
+    
+    
+                return {
+                    "name": name_output,
+                    "nip": nip_output
+    
+                }, 200
+            
+            else:
+    
+                return {
+    
+                    "message": "Something went wrong"
+    
+                }, 400
 
 
